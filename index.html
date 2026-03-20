@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>華語打字闖關遊戲</title>
+    <title>華語打字闖關遊戲 / Mandarin Typing Game</title>
     <style>
         body { font-family: 'Microsoft JhengHei', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 700px; text-align: center; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 750px; text-align: center; }
         .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
         select, input, button { padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; }
-        button { background-color: #4CAF50; color: white; border: none; cursor: pointer; transition: 0.3s; }
+        button { background-color: #4CAF50; color: white; border: none; cursor: pointer; transition: 0.3s; font-weight: bold;}
         button:hover { background-color: #45a049; }
         
         /* 防複製機制 */
@@ -20,17 +20,20 @@
         }
         
         .game-area { margin: 20px 0; }
-        .hanzi-display { font-size: 32px; font-weight: bold; margin-bottom: 20px; letter-spacing: 5px; line-height: 1.5;}
+        .hanzi-display { font-size: 32px; font-weight: bold; margin-bottom: 25px; letter-spacing: 5px; line-height: 1.5; color: #2c3e50;}
         .hanzi-char { display: inline-block; }
         .error { color: #e74c3c; font-weight: bold; } /* 錯誤顯示紅色 */
         .correct { color: #2ecc71; font-weight: bold; }
         
-        #userInput { width: 90%; text-align: center; margin-bottom: 15px; font-size: 18px;}
-        .feedback-area { margin-top: 20px; font-size: 18px; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 5px; display: none; }
+        #userInput { width: 90%; text-align: center; margin-bottom: 15px; font-size: 18px; padding: 12px;}
+        .feedback-area { margin-top: 20px; font-size: 18px; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 5px; display: none; line-height: 1.6;}
         .char-feedback { margin-bottom: 5px; }
         
-        .status-bar { display: flex; justify-content: space-between; font-weight: bold; color: #555; margin-bottom: 15px; }
-        .hint { color: #888; font-size: 15px; background: #eee; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: left;}
+        .status-bar { display: flex; justify-content: space-between; font-weight: bold; color: #555; margin-bottom: 15px; font-size: 18px;}
+        
+        /* 雙語提示區塊樣式 */
+        .hint { color: #444; font-size: 15px; background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 25px; text-align: left; border-left: 5px solid #3498db; line-height: 1.6;}
+        .hint strong { color: #2980b9; }
     </style>
 </head>
 <body>
@@ -38,37 +41,37 @@
 <div class="container">
     <div class="header">
         <select id="lessonSelect">
-            <option value="6">第六課</option>
-            <option value="1">第一課 (測試用)</option>
+            <option value="6">第六課 (Lesson 6)</option>
+            <option value="1">第一課測試 (Lesson 1 Test)</option>
         </select>
         <select id="modeSelect">
-            <option value="pinyin">拼音模式 (Pinyin)</option>
-            <option value="zhuyin">注音模式 (Zhuyin)</option>
+            <option value="pinyin">拼音模式 (Pinyin Mode)</option>
+            <option value="zhuyin">注音模式 (Zhuyin Mode)</option>
         </select>
     </div>
 
     <div class="status-bar">
-        <div id="levelDisplay">關卡：1 / 10</div>
-        <div id="scoreDisplay">總分：0</div>
+        <div id="levelDisplay">關卡 (Level)：1 / 10</div>
+        <div id="scoreDisplay">總分 (Score)：0</div>
     </div>
 
     <div class="game-area">
-        <div id="hanziContainer" class="hanzi-display noselect" oncopy="return false;" oncut="return false;" oncontextmenu="return false;">
-            載入中...
-        </div>
-        
         <div class="hint">
-            💡 <strong>輸入提示：</strong><br>
-            1. 每個字的拼音/注音請包含<strong>聲調符號</strong>。<br>
-            2. 需輸入<strong>全形標點符號</strong>（如：，。）。<br>
-            3. 所有字元與標點符號之間，請用「<strong>空白鍵</strong>」隔開。<br>
-            👉 範例：ㄨㄛˇ ㄏㄣˇ ㄏㄠˇ ， ㄋㄧˇ ㄋㄜ˙ ？ (或 wǒ hěn hǎo ， nǐ ne ？)
+            💡 <strong>輸入提示 / Typing Instructions：</strong><br>
+            1. 每個字的拼音/注音請包含<strong>聲調符號</strong>。 (Please include <strong>tone marks</strong>.)<br>
+            2. 需輸入<strong>全形標點符號</strong>。 (Please use <strong>full-width punctuation</strong> like ， 。)<br>
+            3. 所有字元與標點之間，請用「<strong>空白鍵</strong>」隔開。 (Separate all characters and punctuation with a <strong>Space</strong>.)<br>
+            👉 <strong>範例 / Example：</strong>ㄨㄛˇ ㄏㄣˇ ㄏㄠˇ ， ㄋㄧˇ ㄋㄜ˙ ？ (或 wǒ hěn hǎo ， nǐ ne ？)
+        </div>
+
+        <div id="hanziContainer" class="hanzi-display noselect" oncopy="return false;" oncut="return false;" oncontextmenu="return false;">
+            載入中... (Loading...)
         </div>
         
-        <input type="text" id="userInput" placeholder="請在此輸入對應的拼音或注音與標點" autocomplete="off">
+        <input type="text" id="userInput" placeholder="請在此輸入 (Type your answer here...)" autocomplete="off">
         <br>
-        <button id="submitBtn" onclick="checkAnswer()">送出答案</button>
-        <button id="nextBtn" onclick="nextLevel()" style="display: none; background-color: #3498db;">下一關 ➔</button>
+        <button id="submitBtn" onclick="checkAnswer()">送出答案 (Submit)</button>
+        <button id="nextBtn" onclick="nextLevel()" style="display: none; background-color: #3498db;">下一關 (Next) ➔</button>
     </div>
 
     <div id="feedbackContainer" class="feedback-area"></div>
@@ -106,157 +109,4 @@
             { 
                 hanzi: "表哥的工作需要到處拜訪顧客，推銷產品，非常辛苦。", 
                 pinyin: ["biǎo", "gē", "de", "gōng", "zuò", "xū", "yào", "dào", "chù", "bài", "fǎng", "gù", "kè", "，", "tuī", "xiāo", "chǎn", "pǐn", "，", "fēi", "cháng", "xīn", "kǔ", "。"], 
-                zhuyin: ["ㄅㄧㄠˇ", "ㄍㄜ", "ㄉㄜ˙", "ㄍㄨㄥ", "ㄗㄨㄛˋ", "ㄒㄩ", "ㄧㄠˋ", "ㄉㄠˋ", "ㄔㄨˋ", "ㄅㄞˋ", "ㄈㄤˇ", "ㄍㄨˋ", "ㄎㄜˋ", "，", "ㄊㄨㄟ", "ㄒㄧㄠ", "ㄔㄢˇ", "ㄆㄧㄣˇ", "，", "ㄈㄟ", "ㄔㄤˊ", "ㄒㄧㄣ", "ㄎㄨˇ", "。"] 
-            },
-            { 
-                hanzi: "隨著環境污染越來越嚴重，生病的人也越來越多。", 
-                pinyin: ["suí", "zhe", "huán", "jìng", "wū", "rǎn", "yuè", "lái", "yuè", "yán", "zhòng", "，", "shēng", "bìng", "de", "rén", "yě", "yuè", "lái", "yuè", "duō", "。"], 
-                zhuyin: ["ㄙㄨㄟˊ", "ㄓㄜ˙", "ㄏㄨㄢˊ", "ㄐㄧㄥˋ", "ㄨ", "ㄖㄢˇ", "ㄩㄝˋ", "ㄌㄞˊ", "ㄩㄝˋ", "ㄧㄢˊ", "ㄓㄨㄥˋ", "，", "ㄕㄥ", "ㄅㄧㄥˋ", "ㄉㄜ˙", "ㄖㄣˊ", "ㄧㄝˇ", "ㄩㄝˋ", "ㄌㄞˊ", "ㄩㄝˋ", "ㄉㄨㄛ", "。"] 
-            },
-            { 
-                hanzi: "我寧可不要睡覺，也要熬夜打電動。", 
-                pinyin: ["wǒ", "nìng", "kě", "bú", "yào", "shuì", "jiào", "，", "yě", "yào", "áo", "yè", "dǎ", "diàn", "dòng", "。"], 
-                zhuyin: ["ㄨㄛˇ", "ㄋㄧㄥˋ", "ㄎㄜˇ", "ㄅㄨˊ", "ㄧㄠˋ", "ㄕㄨㄟˋ", "ㄐㄧㄠˋ", "，", "ㄧㄝˇ", "ㄧㄠˋ", "ㄠˊ", "ㄧㄝˋ", "ㄉㄚˇ", "ㄉㄧㄢˋ", "ㄉㄨㄥˋ", "。"] 
-            }
-        ],
-        "1": [
-            { 
-                hanzi: "一二三，四五六。", 
-                pinyin: ["yī", "èr", "sān", "，", "sì", "wǔ", "liù", "。"], 
-                zhuyin: ["ㄧ", "ㄦˋ", "ㄙㄢ", "，", "ㄙˋ", "ㄨˇ", "ㄌㄧㄡˋ", "。"] 
-            }
-        ]
-    };
-
-    let currentLesson = "6";
-    let currentMode = "pinyin";
-    let currentLevel = 0;
-    let score = 0;
-    let questions = [];
-
-    // 初始化遊戲
-    function initGame() {
-        currentLesson = document.getElementById("lessonSelect").value;
-        currentMode = document.getElementById("modeSelect").value;
-        questions = courseData[currentLesson];
-        currentLevel = 0;
-        score = 0;
-        updateStatus();
-        loadQuestion();
-    }
-
-    // 載入題目
-    function loadQuestion() {
-        if (currentLevel >= questions.length) {
-            document.getElementById("hanziContainer").innerHTML = "🎉 恭喜完成本課所有關卡！";
-            document.getElementById("userInput").style.display = "none";
-            document.getElementById("submitBtn").style.display = "none";
-            return;
-        }
-
-        const q = questions[currentLevel];
-        const hanziContainer = document.getElementById("hanziContainer");
-        hanziContainer.innerHTML = ""; // 清空
-        
-        // 將漢字逐字放入 span，方便後續單獨變色
-        for (let i = 0; i < q.hanzi.length; i++) {
-            let span = document.createElement("span");
-            span.className = "hanzi-char";
-            span.id = "hanzi-" + i;
-            span.innerText = q.hanzi[i];
-            hanziContainer.appendChild(span);
-        }
-
-        document.getElementById("userInput").value = "";
-        document.getElementById("userInput").disabled = false;
-        document.getElementById("submitBtn").style.display = "inline-block";
-        document.getElementById("nextBtn").style.display = "none";
-        document.getElementById("feedbackContainer").style.display = "none";
-        document.getElementById("userInput").focus();
-    }
-
-    // 檢查答案
-    function checkAnswer() {
-        const q = questions[currentLevel];
-        const correctAnswers = q[currentMode]; // 根據模式抓取拼音或注音陣列
-        const userInputText = document.getElementById("userInput").value.trim().replace(/\s+/g, ' ');
-        const userAnswers = userInputText.split(" "); // 用空白分割學生的輸入
-
-        let feedbackHTML = `<strong>結果分析：</strong><br>`;
-        let isAllCorrect = true;
-        let pointsEarned = 0;
-        const pointPerChar = 100 / q.hanzi.length; // 根據字數平均分配這關的分數
-
-        for (let i = 0; i < q.hanzi.length; i++) {
-            const char = q.hanzi[i];
-            const correctAns = correctAnswers[i];
-            const userAns = userAnswers[i] || "(未輸入)";
-
-            const hanziSpan = document.getElementById("hanzi-" + i);
-
-            if (userAns.toLowerCase() === correctAns.toLowerCase()) {
-                // 答對
-                hanziSpan.classList.add("correct");
-                // 如果是標點符號，就不特別顯示綠色的字元回饋，以免畫面太雜
-                if (char !== "，" && char !== "。") {
-                    feedbackHTML += `<div class="char-feedback correct">✅ ${char} : 你的答案 [${userAns}]</div>`;
-                }
-                pointsEarned += pointPerChar;
-            } else {
-                // 答錯
-                isAllCorrect = false;
-                hanziSpan.classList.add("error");
-                feedbackHTML += `<div class="char-feedback error">❌ ${char} : 你的答案 [${userAns}] ➔ 正確應為 [${correctAns}]</div>`;
-            }
-        }
-
-        // 更新分數 (四捨五入)
-        score += Math.round(pointsEarned);
-        updateStatus();
-
-        // 顯示回饋
-        const feedbackContainer = document.getElementById("feedbackContainer");
-        feedbackContainer.innerHTML = feedbackHTML;
-        feedbackContainer.style.display = "block";
-
-        // 切換按鈕與輸入框狀態
-        document.getElementById("userInput").disabled = true;
-        document.getElementById("submitBtn").style.display = "none";
-        document.getElementById("nextBtn").style.display = "inline-block";
-    }
-
-    function nextLevel() {
-        currentLevel++;
-        updateStatus();
-        loadQuestion();
-    }
-
-    function updateStatus() {
-        let displayLevel = currentLevel + 1;
-        if (displayLevel > questions.length) displayLevel = questions.length;
-        document.getElementById("levelDisplay").innerText = `關卡：${displayLevel} / ${questions.length}`;
-        document.getElementById("scoreDisplay").innerText = `總分：${score}`;
-    }
-
-    // 監聽選單變更，重新開始
-    document.getElementById("lessonSelect").addEventListener("change", initGame);
-    document.getElementById("modeSelect").addEventListener("change", initGame);
-    
-    // 支援 Enter 鍵送出
-    document.getElementById("userInput").addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            if(document.getElementById("submitBtn").style.display !== "none"){
-                checkAnswer();
-            } else if (document.getElementById("nextBtn").style.display !== "none") {
-                nextLevel();
-            }
-        }
-    });
-
-    // 網頁載入時啟動
-    window.onload = initGame;
-</script>
-
-</body>
-</html>
+                zhuyin: ["ㄅㄧㄠˇ", "ㄍㄜ", "ㄉㄜ˙", "ㄍㄨㄥ", "ㄗㄨㄛˋ", "ㄒㄩ", "ㄧㄠˋ", "
