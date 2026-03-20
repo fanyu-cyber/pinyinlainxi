@@ -6,7 +6,7 @@
     <title>華語打字闖關遊戲</title>
     <style>
         body { font-family: 'Microsoft JhengHei', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 600px; text-align: center; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 700px; text-align: center; }
         .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
         select, input, button { padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; }
         button { background-color: #4CAF50; color: white; border: none; cursor: pointer; transition: 0.3s; }
@@ -20,16 +20,17 @@
         }
         
         .game-area { margin: 20px 0; }
-        .hanzi-display { font-size: 36px; font-weight: bold; margin-bottom: 20px; letter-spacing: 5px;}
+        .hanzi-display { font-size: 32px; font-weight: bold; margin-bottom: 20px; letter-spacing: 5px; line-height: 1.5;}
         .hanzi-char { display: inline-block; }
         .error { color: #e74c3c; font-weight: bold; } /* 錯誤顯示紅色 */
         .correct { color: #2ecc71; font-weight: bold; }
         
-        #userInput { width: 80%; text-align: center; margin-bottom: 15px; }
+        #userInput { width: 90%; text-align: center; margin-bottom: 15px; font-size: 18px;}
         .feedback-area { margin-top: 20px; font-size: 18px; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 5px; display: none; }
         .char-feedback { margin-bottom: 5px; }
         
         .status-bar { display: flex; justify-content: space-between; font-weight: bold; color: #555; margin-bottom: 15px; }
+        .hint { color: #888; font-size: 15px; background: #eee; padding: 10px; border-radius: 5px; margin-bottom: 15px; text-align: left;}
     </style>
 </head>
 <body>
@@ -55,9 +56,16 @@
         <div id="hanziContainer" class="hanzi-display noselect" oncopy="return false;" oncut="return false;" oncontextmenu="return false;">
             載入中...
         </div>
-        <p style="color: #888; font-size: 14px;">提示：每個字的拼音/注音之間請用「空白鍵」隔開。<br>(例如：ㄋㄧ3 ㄏㄠ3 或 ni3 hao3)</p>
         
-        <input type="text" id="userInput" placeholder="請在此輸入對應的拼音或注音" autocomplete="off">
+        <div class="hint">
+            💡 <strong>輸入提示：</strong><br>
+            1. 每個字的拼音/注音請包含<strong>聲調符號</strong>。<br>
+            2. 需輸入<strong>全形標點符號</strong>（如：，。）。<br>
+            3. 所有字元與標點符號之間，請用「<strong>空白鍵</strong>」隔開。<br>
+            👉 範例：ㄨㄛˇ ㄏㄣˇ ㄏㄠˇ ， ㄋㄧˇ ㄋㄜ˙ ？ (或 wǒ hěn hǎo ， nǐ ne ？)
+        </div>
+        
+        <input type="text" id="userInput" placeholder="請在此輸入對應的拼音或注音與標點" autocomplete="off">
         <br>
         <button id="submitBtn" onclick="checkAnswer()">送出答案</button>
         <button id="nextBtn" onclick="nextLevel()" style="display: none; background-color: #3498db;">下一關 ➔</button>
@@ -67,7 +75,8 @@
 </div>
 
 <script>
-  const courseData = {
+    // 題庫資料結構
+    const courseData = {
         "6": [
             { 
                 hanzi: "為了減少對環境的污染，他不用農藥，而且只用天然堆肥。", 
@@ -109,8 +118,21 @@
                 pinyin: ["wǒ", "nìng", "kě", "bú", "yào", "shuì", "jiào", "，", "yě", "yào", "áo", "yè", "dǎ", "diàn", "dòng", "。"], 
                 zhuyin: ["ㄨㄛˇ", "ㄋㄧㄥˋ", "ㄎㄜˇ", "ㄅㄨˊ", "ㄧㄠˋ", "ㄕㄨㄟˋ", "ㄐㄧㄠˋ", "，", "ㄧㄝˇ", "ㄧㄠˋ", "ㄠˊ", "ㄧㄝˋ", "ㄉㄚˇ", "ㄉㄧㄢˋ", "ㄉㄨㄥˋ", "。"] 
             }
+        ],
+        "1": [
+            { 
+                hanzi: "一二三，四五六。", 
+                pinyin: ["yī", "èr", "sān", "，", "sì", "wǔ", "liù", "。"], 
+                zhuyin: ["ㄧ", "ㄦˋ", "ㄙㄢ", "，", "ㄙˋ", "ㄨˇ", "ㄌㄧㄡˋ", "。"] 
+            }
         ]
     };
+
+    let currentLesson = "6";
+    let currentMode = "pinyin";
+    let currentLevel = 0;
+    let score = 0;
+    let questions = [];
 
     // 初始化遊戲
     function initGame() {
@@ -175,7 +197,10 @@
             if (userAns.toLowerCase() === correctAns.toLowerCase()) {
                 // 答對
                 hanziSpan.classList.add("correct");
-                feedbackHTML += `<div class="char-feedback">✅ ${char} : 你的答案 [${userAns}]</div>`;
+                // 如果是標點符號，就不特別顯示綠色的字元回饋，以免畫面太雜
+                if (char !== "，" && char !== "。") {
+                    feedbackHTML += `<div class="char-feedback correct">✅ ${char} : 你的答案 [${userAns}]</div>`;
+                }
                 pointsEarned += pointPerChar;
             } else {
                 // 答錯
