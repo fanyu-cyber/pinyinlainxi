@@ -12,17 +12,16 @@
         button { background-color: #4CAF50; color: white; border: none; cursor: pointer; transition: 0.3s; font-weight: bold;}
         button:hover { background-color: #45a049; }
         
-        /* 防複製機制 */
         .noselect {
-            -webkit-user-select: none; /* Safari */
-            -ms-user-select: none; /* IE 10+ */
-            user-select: none; /* Standard syntax */
+            -webkit-user-select: none;
+            -ms-user-select: none;
+            user-select: none;
         }
         
         .game-area { margin: 20px 0; }
         .hanzi-display { font-size: 32px; font-weight: bold; margin-bottom: 25px; letter-spacing: 5px; line-height: 1.5; color: #2c3e50;}
         .hanzi-char { display: inline-block; }
-        .error { color: #e74c3c; font-weight: bold; } /* 錯誤顯示紅色 */
+        .error { color: #e74c3c; font-weight: bold; }
         .correct { color: #2ecc71; font-weight: bold; }
         
         #userInput { width: 90%; text-align: center; margin-bottom: 15px; font-size: 18px; padding: 12px;}
@@ -31,7 +30,6 @@
         
         .status-bar { display: flex; justify-content: space-between; font-weight: bold; color: #555; margin-bottom: 15px; font-size: 18px;}
         
-        /* 雙語提示區塊樣式 */
         .hint { color: #444; font-size: 15px; background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 25px; text-align: left; border-left: 5px solid #3498db; line-height: 1.6;}
         .hint strong { color: #2980b9; }
     </style>
@@ -78,7 +76,6 @@
 </div>
 
 <script>
-    // 題庫資料結構
     const courseData = {
         "6": [
             { 
@@ -109,4 +106,135 @@
             { 
                 hanzi: "表哥的工作需要到處拜訪顧客，推銷產品，非常辛苦。", 
                 pinyin: ["biǎo", "gē", "de", "gōng", "zuò", "xū", "yào", "dào", "chù", "bài", "fǎng", "gù", "kè", "，", "tuī", "xiāo", "chǎn", "pǐn", "，", "fēi", "cháng", "xīn", "kǔ", "。"], 
-                zhuyin: ["ㄅㄧㄠˇ", "ㄍㄜ", "ㄉㄜ˙", "ㄍㄨㄥ", "ㄗㄨㄛˋ", "ㄒㄩ", "ㄧㄠˋ", "
+                zhuyin: ["ㄅㄧㄠˇ", "ㄍㄜ", "ㄉㄜ˙", "ㄍㄨㄥ", "ㄗㄨㄛˋ", "ㄒㄩ", "ㄧㄠˋ", "ㄉㄠˋ", "ㄔㄨˋ", "ㄅㄞˋ", "ㄈㄤˇ", "ㄍㄨˋ", "ㄎㄜˋ", "，", "ㄊㄨㄟ", "ㄒㄧㄠ", "ㄔㄢˇ", "ㄆㄧㄣˇ", "，", "ㄈㄟ", "ㄔㄤˊ", "ㄒㄧㄣ", "ㄎㄨˇ", "。"] 
+            },
+            { 
+                hanzi: "隨著環境污染越來越嚴重，生病的人也越來越多。", 
+                pinyin: ["suí", "zhe", "huán", "jìng", "wū", "rǎn", "yuè", "lái", "yuè", "yán", "zhòng", "，", "shēng", "bìng", "de", "rén", "yě", "yuè", "lái", "yuè", "duō", "。"], 
+                zhuyin: ["ㄙㄨㄟˊ", "ㄓㄜ˙", "ㄏㄨㄢˊ", "ㄐㄧㄥˋ", "ㄨ", "ㄖㄢˇ", "ㄩㄝˋ", "ㄌㄞˊ", "ㄩㄝˋ", "ㄧㄢˊ", "ㄓㄨㄥˋ", "，", "ㄕㄥ", "ㄅㄧㄥˋ", "ㄉㄜ˙", "ㄖㄣˊ", "ㄧㄝˇ", "ㄩㄝˋ", "ㄌㄞˊ", "ㄩㄝˋ", "ㄉㄨㄛ", "。"] 
+            },
+            { 
+                hanzi: "我寧可不要睡覺，也要熬夜打電動。", 
+                pinyin: ["wǒ", "nìng", "kě", "bú", "yào", "shuì", "jiào", "，", "yě", "yào", "áo", "yè", "dǎ", "diàn", "dòng", "。"], 
+                zhuyin: ["ㄨㄛˇ", "ㄋㄧㄥˋ", "ㄎㄜˇ", "ㄅㄨˊ", "ㄧㄠˋ", "ㄕㄨㄟˋ", "ㄐㄧㄠˋ", "，", "ㄧㄝˇ", "ㄧㄠˋ", "ㄠˊ", "ㄧㄝˋ", "ㄉㄚˇ", "ㄉㄧㄢˋ", "ㄉㄨㄥˋ", "。"] 
+            }
+        ],
+        "1": [
+            { 
+                hanzi: "一二三，四五六。", 
+                pinyin: ["yī", "èr", "sān", "，", "sì", "wǔ", "liù", "。"], 
+                zhuyin: ["ㄧ", "ㄦˋ", "ㄙㄢ", "，", "ㄙˋ", "ㄨˇ", "ㄌㄧㄡˋ", "。"] 
+            }
+        ]
+    };
+
+    let currentLesson = "6";
+    let currentMode = "pinyin";
+    let currentLevel = 0;
+    let score = 0;
+    let questions = [];
+
+    function initGame() {
+        currentLesson = document.getElementById("lessonSelect").value;
+        currentMode = document.getElementById("modeSelect").value;
+        questions = courseData[currentLesson];
+        currentLevel = 0;
+        score = 0;
+        updateStatus();
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentLevel >= questions.length) {
+            document.getElementById("hanziContainer").innerHTML = "🎉 恭喜完成本課所有關卡！ (Congratulations!)";
+            document.getElementById("userInput").style.display = "none";
+            document.getElementById("submitBtn").style.display = "none";
+            return;
+        }
+
+        const q = questions[currentLevel];
+        const hanziContainer = document.getElementById("hanziContainer");
+        hanziContainer.innerHTML = ""; 
+        
+        for (let i = 0; i < q.hanzi.length; i++) {
+            let span = document.createElement("span");
+            span.className = "hanzi-char";
+            span.id = "hanzi-" + i;
+            span.innerText = q.hanzi[i];
+            hanziContainer.appendChild(span);
+        }
+
+        document.getElementById("userInput").value = "";
+        document.getElementById("userInput").disabled = false;
+        document.getElementById("submitBtn").style.display = "inline-block";
+        document.getElementById("nextBtn").style.display = "none";
+        document.getElementById("feedbackContainer").style.display = "none";
+        document.getElementById("userInput").focus();
+    }
+
+    function checkAnswer() {
+        const q = questions[currentLevel];
+        const correctAnswers = q[currentMode]; 
+        const userInputText = document.getElementById("userInput").value.trim().replace(/\s+/g, ' ');
+        const userAnswers = userInputText.split(" "); 
+
+        let feedbackHTML = `<strong>結果分析 (Result)：</strong><br>`;
+        let isAllCorrect = true;
+        let pointsEarned = 0;
+        const pointPerChar = 100 / q.hanzi.length; 
+
+        for (let i = 0; i < q.hanzi.length; i++) {
+            const char = q.hanzi[i];
+            const correctAns = correctAnswers[i];
+            const userAns = userAnswers[i] || "(未輸入/Empty)";
+
+            const hanziSpan = document.getElementById("hanzi-" + i);
+
+            if (userAns.toLowerCase() === correctAns.toLowerCase()) {
+                hanziSpan.classList.add("correct");
+                if (char !== "，" && char !== "。") {
+                    feedbackHTML += `<div class="char-feedback correct">✅ ${char} : 你的答案 [${userAns}]</div>`;
+                }
+                pointsEarned += pointPerChar;
+            } else {
+                isAllCorrect = false;
+                hanziSpan.classList.add("error");
+                feedbackHTML += `<div class="char-feedback error">❌ ${char} : 你的答案 [${userAns}] ➔ 正確應為 [${correctAns}]</div>`;
+            }
+        }
+
+        score += Math.round(pointsEarned);
+        updateStatus();
+
+        const feedbackContainer = document.getElementById("feedbackContainer");
+        feedbackContainer.innerHTML = feedbackHTML;
+        feedbackContainer.style.display = "block";
+
+        document.getElementById("userInput").disabled = true;
+        document.getElementById("submitBtn").style.display = "none";
+        document.getElementById("nextBtn").style.display = "inline-block";
+    }
+
+    function nextLevel() {
+        currentLevel++;
+        updateStatus();
+        loadQuestion();
+    }
+
+    function updateStatus() {
+        let displayLevel = currentLevel + 1;
+        if (displayLevel > questions.length) displayLevel = questions.length;
+        document.getElementById("levelDisplay").innerText = `關卡 (Level)：${displayLevel} / ${questions.length}`;
+        document.getElementById("scoreDisplay").innerText = `總分 (Score)：${score}`;
+    }
+
+    // 當網頁元素全部載入完成後，才啟動遊戲 (避免找不到元素的錯誤)
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("lessonSelect").addEventListener("change", initGame);
+        document.getElementById("modeSelect").addEventListener("change", initGame);
+        initGame();
+    });
+
+</script>
+</body>
+</html>
