@@ -28,7 +28,7 @@
         .feedback-area { margin-top: 20px; font-size: 18px; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 5px; display: none; line-height: 1.6;}
         .char-feedback { margin-bottom: 5px; }
         
-        /* 將分數顯示加大加粗，加上醒目的顏色 */
+        /* 分數顯示樣式 */
         .status-bar { display: flex; justify-content: space-between; font-weight: bold; color: #555; margin-bottom: 15px; font-size: 20px;}
         #scoreDisplay { color: #d35400; }
         
@@ -82,6 +82,7 @@
 </div>
 
 <script>
+    // 題庫資料區
     const courseData = {
         "7": [
             {
@@ -134,4 +135,164 @@
             { 
                 hanzi: "為了減少對環境的污染，他不用農藥，而且只用天然堆肥。", 
                 pinyin: ["wei4", "le5", "jian3", "shao3", "dui4", "huan2", "jing4", "de5", "wu1", "ran3", "，", "ta1", "bu2", "yong4", "nong2", "yao4", "，", "er2", "qie3", "zhi3", "yong4", "tian1", "ran2", "dui1", "fei2", "。"], 
-                zhuyin: ["ㄨㄟ4", "ㄌㄜ5", "ㄐㄧㄢ3", "ㄕㄠ3", "ㄉㄨㄟ4", "ㄏㄨㄢ2", "
+                zhuyin: ["ㄨㄟ4", "ㄌㄜ5", "ㄐㄧㄢ3", "ㄕㄠ3", "ㄉㄨㄟ4", "ㄏㄨㄢ2", "ㄐㄧㄥ4", "ㄉㄜ5", "ㄨ1", "ㄖㄢ3", "，", "ㄊㄚ1", "ㄅㄨ2", "ㄩㄥ4", "ㄋㄨㄥ2", "ㄧㄠ4", "，", "ㄦ2", "ㄑㄧㄝ3", "ㄓ3", "ㄩㄥ4", "ㄊㄧㄢ1", "ㄖㄢ2", "ㄉㄨㄟ1", "ㄈㄟ2", "。"] 
+            },
+            { 
+                hanzi: "農夫在台灣的社會地位不高，收入也不穩定。", 
+                pinyin: ["nong2", "fu1", "zai4", "tai2", "wan1", "de5", "she4", "hui4", "di4", "wei4", "bu4", "gao1", "，", "shou1", "ru4", "ye3", "bu4", "wen3", "ding4", "。"], 
+                zhuyin: ["ㄋㄨㄥ2", "ㄈㄨ1", "ㄗㄞ4", "ㄊㄞ2", "ㄨㄢ1", "ㄉㄜ5", "ㄕㄜ4", "ㄏㄨㄟ4", "ㄉㄧ4", "ㄨㄟ4", "ㄅㄨ4", "ㄍㄠ1", "，", "ㄕㄡ1", "ㄖㄨ4", "ㄧㄝ3", "ㄅㄨ4", "ㄨㄣ3", "ㄉㄧㄥ4", "。"] 
+            },
+            { 
+                hanzi: "今天我請客，大家盡量吃，別客氣。", 
+                pinyin: ["jin1", "tian1", "wo3", "qing3", "ke4", "，", "da4", "jia1", "jin4", "liang4", "chi1", "，", "bie2", "ke4", "qi4", "。"], 
+                zhuyin: ["ㄐㄧㄣ1", "ㄊㄧㄢ1", "ㄨㄛ3", "ㄑㄧㄥ3", "ㄎㄜ4", "，", "ㄉㄚ4", "ㄐㄧㄚ1", "ㄐㄧㄣ4", "ㄌㄧㄤ4", "ㄔ1", "，", "ㄅㄧㄝ2", "ㄎㄜ4", "ㄑㄧ4", "。"] 
+            },
+            { 
+                hanzi: "為了支持當地農業，他每個星期都會跑一趟農夫市集。", 
+                pinyin: ["wei4", "le5", "zhi1", "chi2", "dang1", "di4", "nong2", "ye4", "，", "ta1", "mei3", "ge4", "xing1", "qi1", "dou1", "hui4", "pao3", "yi2", "tang4", "nong2", "fu1", "shi4", "ji2", "。"], 
+                zhuyin: ["ㄨㄟ4", "ㄌㄜ5", "ㄓ1", "ㄔ2", "ㄉㄤ1", "ㄉㄧ4", "ㄋㄨㄥ2", "ㄧㄝ4", "，", "ㄊㄚ1", "ㄇㄟ3", "ㄍㄜ5", "ㄒㄧㄥ1", "ㄑㄧ1", "ㄉㄡ1", "ㄏㄨㄟ4", "ㄆㄠ3", "ㄧ2", "ㄊㄤ4", "ㄋㄨㄥ2", "ㄈㄨ1", "ㄕ4", "ㄐㄧ2", "。"] 
+            },
+            { 
+                hanzi: "由於農村的工作機會不多，許多年輕人選擇到城市發展。", 
+                pinyin: ["you2", "yu2", "nong2", "cun1", "de5", "gong1", "zuo4", "ji1", "hui4", "bu4", "duo1", "，", "xu3", "duo1", "nian2", "qing1", "ren2", "xuan3", "ze2", "dao4", "cheng2", "shi4", "fa1", "zhan3", "。"], 
+                zhuyin: ["ㄧㄡ2", "ㄩ2", "ㄋㄨㄥ2", "ㄘㄨㄣ1", "ㄉㄜ5", "ㄍㄨㄥ1", "ㄗㄨㄛ4", "ㄐㄧ1", "ㄏㄨㄟ4", "ㄅㄨ4", "ㄉㄨㄛ1", "，", "ㄒㄩ3", "ㄉㄨㄛ1", "ㄋㄧㄢ2", "ㄑㄧㄥ1", "ㄖㄣ2", "ㄒㄩㄢ3", "ㄗㄜ2", "ㄉㄠ4", "ㄔㄥ2", "ㄕ4", "ㄈㄚ1", "ㄓㄢ3", "。"] 
+            },
+            { 
+                hanzi: "表哥的工作需要到處拜訪顧客，推銷產品，非常辛苦。", 
+                pinyin: ["biao3", "ge1", "de5", "gong1", "zuo4", "xu1", "yao4", "dao4", "chu4", "bai4", "fang3", "gu4", "ke4", "，", "tui1", "xiao1", "chan3", "pin3", "，", "fei1", "chang2", "xin1", "ku3", "。"], 
+                zhuyin: ["ㄅㄧㄠ3", "ㄍㄜ1", "ㄉㄜ5", "ㄍㄨㄥ1", "ㄗㄨㄛ4", "ㄒㄩ1", "ㄧㄠ4", "ㄉㄠ4", "ㄔㄨ4", "ㄅㄞ4", "ㄈㄤ3", "ㄍㄨ4", "ㄎㄜ4", "，", "ㄊㄨㄟ1", "ㄒㄧㄠ1", "ㄔㄢ3", "ㄆㄧㄣ3", "，", "ㄈㄟ1", "ㄔㄤ2", "ㄒㄧㄣ1", "ㄎㄨ3", "。"] 
+            },
+            { 
+                hanzi: "隨著環境污染越來越嚴重，生病的人也越來越多。", 
+                pinyin: ["sui2", "zhe5", "huan2", "jing4", "wu1", "ran3", "yue4", "lai2", "yue4", "yan2", "zhong4", "，", "sheng1", "bing4", "de5", "ren2", "ye3", "yue4", "lai2", "yue4", "duo1", "。"], 
+                zhuyin: ["ㄙㄨㄟ2", "ㄓㄜ5", "ㄏㄨㄢ2", "ㄐㄧㄥ4", "ㄨ1", "ㄖㄢ3", "ㄩㄝ4", "ㄌㄞ2", "ㄩㄝ4", "ㄧㄢ2", "ㄓㄨㄥ4", "，", "ㄕㄥ1", "ㄅㄧㄥ4", "ㄉㄜ5", "ㄖㄣ2", "ㄧㄝ3", "ㄩㄝ4", "ㄌㄞ2", "ㄩㄝ4", "ㄉㄨㄛ1", "。"] 
+            },
+            { 
+                hanzi: "我寧可不要睡覺，也要熬夜打電動。", 
+                pinyin: ["wo3", "ning4", "ke3", "bu2", "yao4", "shui4", "jiao4", "，", "ye3", "yao4", "ao2", "ye4", "da3", "dian4", "dong4", "。"], 
+                zhuyin: ["ㄨㄛ3", "ㄋㄧㄥ4", "ㄎㄜ3", "ㄅㄨ2", "ㄧㄠ4", "ㄕㄨㄟ4", "ㄐㄧㄠ4", "，", "ㄧㄝ3", "ㄧㄠ4", "ㄠ2", "ㄧㄝ4", "ㄉㄚ3", "ㄉㄧㄢ4", "ㄉㄨㄥ4", "。"] 
+            }
+        ],
+        "1": [
+            { 
+                hanzi: "一二三，四五六。", 
+                pinyin: ["yi1", "er4", "san1", "，", "si4", "wu3", "liu4", "。"], 
+                zhuyin: ["ㄧ1", "ㄦ4", "ㄙㄢ1", "，", "ㄙ4", "ㄨ3", "ㄌㄧㄡ4", "。"] 
+            }
+        ]
+    };
+
+    let currentLesson = "7";
+    let currentMode = "pinyin";
+    let currentLevel = 0;
+    let score = 0;
+    let totalLessonScore = 0; 
+    let questions = [];
+
+    function initGame() {
+        currentLesson = document.getElementById("lessonSelect").value;
+        currentMode = document.getElementById("modeSelect").value;
+        questions = courseData[currentLesson];
+        currentLevel = 0;
+        score = 0;
+        
+        totalLessonScore = 0;
+        for (let i = 0; i < questions.length; i++) {
+            totalLessonScore += questions[i].hanzi.length;
+        }
+
+        updateStatus();
+        loadQuestion();
+    }
+
+    function loadQuestion() {
+        if (currentLevel >= questions.length) {
+            document.getElementById("hanziContainer").innerHTML = "🎉 恭喜完成本課所有關卡！ (Congratulations!)";
+            document.getElementById("userInput").style.display = "none";
+            document.getElementById("submitBtn").style.display = "none";
+            return;
+        }
+
+        const q = questions[currentLevel];
+        const hanziContainer = document.getElementById("hanziContainer");
+        hanziContainer.innerHTML = ""; 
+        
+        for (let i = 0; i < q.hanzi.length; i++) {
+            let span = document.createElement("span");
+            span.className = "hanzi-char";
+            span.id = "hanzi-" + i;
+            span.innerText = q.hanzi[i];
+            hanziContainer.appendChild(span);
+        }
+
+        document.getElementById("userInput").value = "";
+        document.getElementById("userInput").disabled = false;
+        document.getElementById("submitBtn").style.display = "inline-block";
+        document.getElementById("nextBtn").style.display = "none";
+        document.getElementById("feedbackContainer").style.display = "none";
+        document.getElementById("userInput").focus();
+    }
+
+    function checkAnswer() {
+        const q = questions[currentLevel];
+        const correctAnswers = q[currentMode]; 
+        const userInputText = document.getElementById("userInput").value.trim().replace(/\s+/g, ' ');
+        const userAnswers = userInputText.split(" "); 
+
+        let feedbackHTML = `<strong>結果分析 (Result)：</strong><br>`;
+        let pointsEarned = 0;
+        const pointPerChar = 1; 
+
+        for (let i = 0; i < q.hanzi.length; i++) {
+            const char = q.hanzi[i];
+            const correctAns = correctAnswers[i];
+            const userAns = userAnswers[i] || "(未輸入/Empty)";
+
+            const hanziSpan = document.getElementById("hanzi-" + i);
+
+            if (userAns.toLowerCase() === correctAns.toLowerCase()) {
+                hanziSpan.classList.add("correct");
+                if (char !== "，" && char !== "。") {
+                    feedbackHTML += `<div class="char-feedback correct">✅ ${char} : 你的答案 [${userAns}]</div>`;
+                }
+                pointsEarned += pointPerChar;
+            } else {
+                hanziSpan.classList.add("error");
+                feedbackHTML += `<div class="char-feedback error">❌ ${char} : 你的答案 [${userAns}] ➔ 正確應為 [${correctAns}]</div>`;
+            }
+        }
+
+        score += pointsEarned;
+        updateStatus();
+
+        const feedbackContainer = document.getElementById("feedbackContainer");
+        feedbackContainer.innerHTML = feedbackHTML;
+        feedbackContainer.style.display = "block";
+
+        document.getElementById("userInput").disabled = true;
+        document.getElementById("submitBtn").style.display = "none";
+        document.getElementById("nextBtn").style.display = "inline-block";
+    }
+
+    function nextLevel() {
+        currentLevel++;
+        updateStatus();
+        loadQuestion();
+    }
+
+    function updateStatus() {
+        let displayLevel = currentLevel + 1;
+        if (displayLevel > questions.length) displayLevel = questions.length;
+        document.getElementById("levelDisplay").innerText = `關卡 (Level)：${displayLevel} / ${questions.length}`;
+        document.getElementById("scoreDisplay").innerText = `總分 (Score)：${score} / ${totalLessonScore}`;
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("lessonSelect").addEventListener("change", initGame);
+        document.getElementById("modeSelect").addEventListener("change", initGame);
+        initGame();
+    });
+
+</script>
+</body>
+</html>
