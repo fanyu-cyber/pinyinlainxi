@@ -3,296 +3,135 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>華語打字闖關遊戲 / Mandarin Typing Game</title>
+    <title>華語打字 - 作文練習模式</title>
     <style>
-        body { font-family: 'Microsoft JhengHei', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding: 20px; }
-        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 750px; text-align: center; }
-        .header { display: flex; justify-content: space-between; margin-bottom: 20px; }
-        select, input, button { padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; }
-        button { background-color: #4CAF50; color: white; border: none; cursor: pointer; transition: 0.3s; font-weight: bold;}
-        button:hover { background-color: #45a049; }
+        body { font-family: 'Microsoft JhengHei', sans-serif; background-color: #f4f7f6; padding: 20px; display: flex; justify-content: center; }
+        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 1000px; }
         
-        .noselect {
-            -webkit-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        select, button { padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; }
+        button { background-color: #3498db; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
+        button:hover { background-color: #2980b9; }
+
+        .hint { color: #e74c3c; font-size: 16px; font-weight: bold; background: #fadbd8; padding: 10px; border-radius: 5px; margin-bottom: 20px; text-align: center; }
+        .hint.used { color: #7f8c8d; background: #ecf0f1; }
+
+        /* 左右分割版面 */
+        .split-layout { display: flex; gap: 20px; }
+        .left-pane, .right-pane { flex: 1; display: flex; flex-direction: column; }
         
-        .game-area { margin: 20px 0; }
-        .hanzi-display { font-size: 32px; font-weight: bold; margin-bottom: 25px; letter-spacing: 5px; line-height: 1.5; color: #2c3e50;}
-        .hanzi-char { display: inline-block; }
-        .error { color: #e74c3c; font-weight: bold; }
-        .correct { color: #2ecc71; font-weight: bold; }
+        .pane-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #2c3e50; }
         
-        #userInput { width: 90%; text-align: center; margin-bottom: 15px; font-size: 18px; padding: 12px;}
-        .feedback-area { margin-top: 20px; font-size: 18px; text-align: left; background: #f9f9f9; padding: 15px; border-radius: 5px; display: none; line-height: 1.6;}
-        .char-feedback { margin-bottom: 5px; }
+        .essay-source { background: #fdfbf7; padding: 20px; border: 1px solid #e0d6c8; border-radius: 8px; font-size: 18px; line-height: 1.8; color: #333; height: 400px; overflow-y: auto; white-space: pre-wrap; }
         
-        /* 分數顯示樣式 */
-        .status-bar { display: flex; justify-content: space-between; font-weight: bold; color: #555; margin-bottom: 15px; font-size: 20px;}
-        #scoreDisplay { color: #d35400; }
-        
-        .hint { color: #444; font-size: 15px; background: #e8f4f8; padding: 15px; border-radius: 8px; margin-bottom: 25px; text-align: left; border-left: 5px solid #3498db; line-height: 1.6;}
-        .hint strong { color: #2980b9; }
+        textarea { width: 100%; height: 400px; font-size: 18px; line-height: 1.8; padding: 15px; border: 1px solid #bdc3c7; border-radius: 8px; resize: none; box-sizing: border-box; font-family: 'Microsoft JhengHei', sans-serif; }
+        textarea:focus { outline: none; border-color: #3498db; box-shadow: 0 0 5px rgba(52, 152, 219, 0.5); }
+
+        .submit-area { text-align: right; margin-top: 15px; }
+        #resultDisplay { margin-top: 15px; font-size: 18px; font-weight: bold; text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
     <div class="header">
-        <select id="lessonSelect">
-            <option value="7">第七課 (Lesson 7)</option>
-            <option value="6">第六課 (Lesson 6)</option>
-            <option value="1">第一課測試 (Lesson 1 Test)</option>
-        </select>
-        <select id="modeSelect">
-            <option value="pinyin">拼音模式 (Pinyin Mode)</option>
-            <option value="zhuyin">注音模式 (Zhuyin Mode)</option>
+        <h2>📝 作文打字練習區</h2>
+        <select id="essaySelect" onchange="loadEssay()">
+            <option value="1">第一篇：我的夢想</option>
+            <option value="2">第二篇：難忘的旅行</option>
         </select>
     </div>
 
-    <div class="status-bar">
-        <div id="levelDisplay">關卡 (Level)：1 / 10</div>
-        <div id="scoreDisplay">總分 (Score)：0 / 0</div>
+    <div id="pasteHint" class="hint">
+        💡 注意：為訓練打字，本文輸入格只有「一次」貼上文字的機會！
     </div>
 
-    <div class="game-area">
-        <div class="hint">
-            💡 <strong>輸入提示 / Typing Instructions：</strong><br>
-            1. 請在每個字後面加上<strong>數字聲調 1~5</strong>（5 代表輕聲）。<br>
-               (Add <strong>tone numbers 1~5</strong> after each syllable. Use 5 for neutral tone.)<br>
-            2. 需輸入<strong>全形標點符號</strong>。 (Please use <strong>full-width punctuation</strong> like ， 。)<br>
-            3. 所有字元與標點之間，請用「<strong>空白鍵</strong>」隔開。 (Separate everything with a <strong>Space</strong>.)<br>
-            👉 <strong>範例 / Example：</strong><br>
-            拼音：wo3 hen3 hao3 ， ni3 ne5 ？<br>
-            注音：ㄨㄛ3 ㄏㄣ3 ㄏㄠ3 ， ㄋㄧ3 ㄋㄜ5 ？
+    <div class="split-layout">
+        <div class="left-pane">
+            <div class="pane-title">📖 閱讀文章</div>
+            <div id="essaySource" class="essay-source">載入中...</div>
         </div>
 
-        <div id="hanziContainer" class="hanzi-display noselect" oncopy="return false;" oncut="return false;" oncontextmenu="return false;">
-            載入中... (Loading...)
+        <div class="right-pane">
+            <div class="pane-title">⌨️ 請在此輸入</div>
+            <textarea id="essayInput" placeholder="請對照左方文章，在此輸入內容..."></textarea>
+            
+            <div class="submit-area">
+                <button onclick="checkEssay()">送出批改 (Submit)</button>
+            </div>
         </div>
-        
-        <input type="text" id="userInput" placeholder="請在此輸入 (Type your answer here...)" autocomplete="off">
-        <br>
-        <button id="submitBtn" onclick="checkAnswer()">送出答案 (Submit)</button>
-        <button id="nextBtn" onclick="nextLevel()" style="display: none; background-color: #3498db;">下一關 (Next) ➔</button>
     </div>
 
-    <div id="feedbackContainer" class="feedback-area"></div>
+    <div id="resultDisplay"></div>
 </div>
 
 <script>
-    // 題庫資料區
-    const courseData = {
-        "7": [
-            {
-                hanzi: "他們各說各的，沒辦法一起討論。",
-                pinyin: ["ta1", "men5", "ge4", "shuo1", "ge4", "de5", "，", "mei2", "ban4", "fa3", "yi4", "qi3", "tao3", "lun4", "。"],
-                zhuyin: ["ㄊㄚ1", "ㄇㄣ5", "ㄍㄜ4", "ㄕㄨㄛ1", "ㄍㄜ4", "ㄉㄜ5", "，", "ㄇㄟ2", "ㄅㄢ4", "ㄈㄚ3", "ㄧ4", "ㄑㄧ3", "ㄊㄠ3", "ㄌㄨㄣ4", "。"]
-            },
-            {
-                hanzi: "他們一起去夜市，可是各逛各的。",
-                pinyin: ["ta1", "men5", "yi4", "qi3", "qu4", "ye4", "shi4", "，", "ke3", "shi4", "ge4", "guang4", "ge4", "de5", "。"],
-                zhuyin: ["ㄊㄚ1", "ㄇㄣ5", "ㄧ4", "ㄑㄧ3", "ㄑㄩ4", "ㄧㄝ4", "ㄕ4", "，", "ㄎㄜ3", "ㄕ4", "ㄍㄜ4", "ㄍㄨㄤ4", "ㄍㄜ4", "ㄉㄜ5", "。"]
-            },
-            {
-                hanzi: "就算我再忙，我也會參加你的婚禮。",
-                pinyin: ["jiu4", "suan4", "wo3", "zai4", "mang2", "，", "wo3", "ye3", "hui4", "can1", "jia1", "ni3", "de5", "hun1", "li3", "。"],
-                zhuyin: ["ㄐㄧㄡ4", "ㄙㄨㄢ4", "ㄨㄛ3", "ㄗㄞ4", "ㄇㄤ2", "，", "ㄨㄛ3", "ㄧㄝ3", "ㄏㄨㄟ4", "ㄘㄢ1", "ㄐㄧㄚ1", "ㄋㄧ3", "ㄉㄜ5", "ㄏㄨㄣ1", "ㄌㄧ3", "。"]
-            },
-            {
-                hanzi: "就算爸爸再忙，也會記得幫孩子整理書包。",
-                pinyin: ["jiu4", "suan4", "ba4", "ba5", "zai4", "mang2", "，", "ye3", "hui4", "ji4", "de5", "bang1", "hai2", "zi5", "zheng3", "li3", "shu1", "bao1", "。"],
-                zhuyin: ["ㄐㄧㄡ4", "ㄙㄨㄢ4", "ㄅㄚ4", "ㄅㄚ5", "ㄗㄞ4", "ㄇㄤ2", "，", "ㄧㄝ3", "ㄏㄨㄟ4", "ㄐㄧ4", "ㄉㄜ5", "ㄅㄤ1", "ㄏㄞ2", "ㄗ5", "ㄓㄥ3", "ㄌㄧ3", "ㄕㄨ1", "ㄅㄠ1", "。"]
-            },
-            {
-                hanzi: "就算你再孤單，也不可以當別人的小三。",
-                pinyin: ["jiu4", "suan4", "ni3", "zai4", "gu1", "dan1", "，", "ye3", "bu4", "ke3", "yi3", "dang1", "bie2", "ren2", "de5", "xiao3", "san1", "。"],
-                zhuyin: ["ㄐㄧㄡ4", "ㄙㄨㄢ4", "ㄋㄧ3", "ㄗㄞ4", "ㄍㄨ1", "ㄉㄢ1", "，", "ㄧㄝ3", "ㄅㄨ4", "ㄎㄜ3", "ㄧ3", "ㄉㄤ1", "ㄅㄧㄝ2", "ㄖㄣ2", "ㄉㄜ5", "ㄒㄧㄠ3", "ㄙㄢ1", "。"]
-            },
-            {
-                hanzi: "因為工作的關係，我需要一位懂義大利語的翻譯人員。",
-                pinyin: ["yin1", "wei4", "gong1", "zuo4", "de5", "guan1", "xi5", "，", "wo3", "xu1", "yao4", "yi2", "wei4", "dong3", "yi4", "da4", "li4", "yu3", "de5", "fan1", "yi4", "ren2", "yuan2", "。"],
-                zhuyin: ["ㄧㄣ1", "ㄨㄟ4", "ㄍㄨㄥ1", "ㄗㄨㄛ4", "ㄉㄜ5", "ㄍㄨㄢ1", "ㄒㄧ5", "，", "ㄨㄛ3", "ㄒㄩ1", "ㄧㄠ4", "ㄧ2", "ㄨㄟ4", "ㄉㄨㄥ3", "ㄧ4", "ㄉㄚ4", "ㄌㄧ4", "ㄩ3", "ㄉㄜ5", "ㄈㄢ1", "ㄧ4", "ㄖㄣ2", "ㄩㄢ2", "。"]
-            },
-            {
-                hanzi: "因為連續劇的影響，街上賣韓國炸雞的人越來越多。",
-                pinyin: ["yin1", "wei4", "lian2", "xu4", "ju4", "de5", "ying3", "xiang3", "，", "jie1", "shang4", "mai4", "han2", "guo2", "zha2", "ji1", "de5", "ren2", "yue4", "lai2", "yue4", "duo1", "。"],
-                zhuyin: ["ㄧㄣ1", "ㄨㄟ4", "ㄌㄧㄢ2", "ㄒㄩ4", "ㄐㄩ4", "ㄉㄜ5", "ㄧㄥ3", "ㄒㄧㄤ3", "，", "ㄐㄧㄝ1", "ㄕㄤ4", "ㄇㄞ4", "ㄏㄢ2", "ㄍㄨㄛ2", "ㄓㄚ2", "ㄐㄧ1", "ㄉㄜ5", "ㄖㄣ2", "ㄩㄝ4", "ㄌㄞ2", "ㄩㄝ4", "ㄉㄨㄛ1", "。"]
-            },
-            {
-                hanzi: "我最近開始吃素，一來是因為天氣太熱，二來是多吃青菜對身體比較好。",
-                pinyin: ["wo3", "zui4", "jin4", "kai1", "shi3", "chi1", "su4", "，", "yi1", "lai2", "shi4", "yin1", "wei4", "tian1", "qi4", "tai4", "re4", "，", "er4", "lai2", "shi4", "duo1", "chi1", "qing1", "cai4", "dui4", "shen1", "ti3", "bi3", "jiao4", "hao3", "。"],
-                zhuyin: ["ㄨㄛ3", "ㄗㄨㄟ4", "ㄐㄧㄣ4", "ㄎㄞ1", "ㄕ3", "ㄔ1", "ㄙㄨ4", "，", "ㄧ1", "ㄌㄞ2", "ㄕ4", "ㄧㄣ1", "ㄨㄟ4", "ㄊㄧㄢ1", "ㄑㄧ4", "ㄊㄞ4", "ㄖㄜ4", "，", "ㄦ4", "ㄌㄞ2", "ㄕ4", "ㄉㄨㄛ1", "ㄔ1", "ㄑㄧㄥ1", "ㄘㄞ4", "ㄉㄨㄟ4", "ㄕㄣ1", "ㄊㄧ3", "ㄅㄧ3", "ㄐㄧㄠ4", "ㄏㄠ3", "。"]
-            },
-            {
-                hanzi: "我已經跟我男友分手了，我們不會再見面了。",
-                pinyin: ["wo3", "yi3", "jing1", "gen1", "wo3", "nan2", "you3", "fen1", "shou3", "le5", "，", "wo3", "men5", "bu2", "hui4", "zai4", "jian4", "mian4", "le5", "。"],
-                zhuyin: ["ㄨㄛ3", "ㄧ3", "ㄐㄧㄥ1", "ㄍㄣ1", "ㄨㄛ3", "ㄋㄢ2", "ㄧㄡ3", "ㄈㄣ1", "ㄕㄡ3", "ㄌㄜ5", "，", "ㄨㄛ3", "ㄇㄣ5", "ㄅㄨ2", "ㄏㄨㄟ4", "ㄗㄞ4", "ㄐㄧㄢ4", "ㄇㄧㄢ4", "ㄌㄜ5", "。"]
-            }
-        ],
-        "6": [
-            { 
-                hanzi: "為了減少對環境的污染，他不用農藥，而且只用天然堆肥。", 
-                pinyin: ["wei4", "le5", "jian3", "shao3", "dui4", "huan2", "jing4", "de5", "wu1", "ran3", "，", "ta1", "bu2", "yong4", "nong2", "yao4", "，", "er2", "qie3", "zhi3", "yong4", "tian1", "ran2", "dui1", "fei2", "。"], 
-                zhuyin: ["ㄨㄟ4", "ㄌㄜ5", "ㄐㄧㄢ3", "ㄕㄠ3", "ㄉㄨㄟ4", "ㄏㄨㄢ2", "ㄐㄧㄥ4", "ㄉㄜ5", "ㄨ1", "ㄖㄢ3", "，", "ㄊㄚ1", "ㄅㄨ2", "ㄩㄥ4", "ㄋㄨㄥ2", "ㄧㄠ4", "，", "ㄦ2", "ㄑㄧㄝ3", "ㄓ3", "ㄩㄥ4", "ㄊㄧㄢ1", "ㄖㄢ2", "ㄉㄨㄟ1", "ㄈㄟ2", "。"] 
-            },
-            { 
-                hanzi: "農夫在台灣的社會地位不高，收入也不穩定。", 
-                pinyin: ["nong2", "fu1", "zai4", "tai2", "wan1", "de5", "she4", "hui4", "di4", "wei4", "bu4", "gao1", "，", "shou1", "ru4", "ye3", "bu4", "wen3", "ding4", "。"], 
-                zhuyin: ["ㄋㄨㄥ2", "ㄈㄨ1", "ㄗㄞ4", "ㄊㄞ2", "ㄨㄢ1", "ㄉㄜ5", "ㄕㄜ4", "ㄏㄨㄟ4", "ㄉㄧ4", "ㄨㄟ4", "ㄅㄨ4", "ㄍㄠ1", "，", "ㄕㄡ1", "ㄖㄨ4", "ㄧㄝ3", "ㄅㄨ4", "ㄨㄣ3", "ㄉㄧㄥ4", "。"] 
-            },
-            { 
-                hanzi: "今天我請客，大家盡量吃，別客氣。", 
-                pinyin: ["jin1", "tian1", "wo3", "qing3", "ke4", "，", "da4", "jia1", "jin4", "liang4", "chi1", "，", "bie2", "ke4", "qi4", "。"], 
-                zhuyin: ["ㄐㄧㄣ1", "ㄊㄧㄢ1", "ㄨㄛ3", "ㄑㄧㄥ3", "ㄎㄜ4", "，", "ㄉㄚ4", "ㄐㄧㄚ1", "ㄐㄧㄣ4", "ㄌㄧㄤ4", "ㄔ1", "，", "ㄅㄧㄝ2", "ㄎㄜ4", "ㄑㄧ4", "。"] 
-            },
-            { 
-                hanzi: "為了支持當地農業，他每個星期都會跑一趟農夫市集。", 
-                pinyin: ["wei4", "le5", "zhi1", "chi2", "dang1", "di4", "nong2", "ye4", "，", "ta1", "mei3", "ge4", "xing1", "qi1", "dou1", "hui4", "pao3", "yi2", "tang4", "nong2", "fu1", "shi4", "ji2", "。"], 
-                zhuyin: ["ㄨㄟ4", "ㄌㄜ5", "ㄓ1", "ㄔ2", "ㄉㄤ1", "ㄉㄧ4", "ㄋㄨㄥ2", "ㄧㄝ4", "，", "ㄊㄚ1", "ㄇㄟ3", "ㄍㄜ5", "ㄒㄧㄥ1", "ㄑㄧ1", "ㄉㄡ1", "ㄏㄨㄟ4", "ㄆㄠ3", "ㄧ2", "ㄊㄤ4", "ㄋㄨㄥ2", "ㄈㄨ1", "ㄕ4", "ㄐㄧ2", "。"] 
-            },
-            { 
-                hanzi: "由於農村的工作機會不多，許多年輕人選擇到城市發展。", 
-                pinyin: ["you2", "yu2", "nong2", "cun1", "de5", "gong1", "zuo4", "ji1", "hui4", "bu4", "duo1", "，", "xu3", "duo1", "nian2", "qing1", "ren2", "xuan3", "ze2", "dao4", "cheng2", "shi4", "fa1", "zhan3", "。"], 
-                zhuyin: ["ㄧㄡ2", "ㄩ2", "ㄋㄨㄥ2", "ㄘㄨㄣ1", "ㄉㄜ5", "ㄍㄨㄥ1", "ㄗㄨㄛ4", "ㄐㄧ1", "ㄏㄨㄟ4", "ㄅㄨ4", "ㄉㄨㄛ1", "，", "ㄒㄩ3", "ㄉㄨㄛ1", "ㄋㄧㄢ2", "ㄑㄧㄥ1", "ㄖㄣ2", "ㄒㄩㄢ3", "ㄗㄜ2", "ㄉㄠ4", "ㄔㄥ2", "ㄕ4", "ㄈㄚ1", "ㄓㄢ3", "。"] 
-            },
-            { 
-                hanzi: "表哥的工作需要到處拜訪顧客，推銷產品，非常辛苦。", 
-                pinyin: ["biao3", "ge1", "de5", "gong1", "zuo4", "xu1", "yao4", "dao4", "chu4", "bai4", "fang3", "gu4", "ke4", "，", "tui1", "xiao1", "chan3", "pin3", "，", "fei1", "chang2", "xin1", "ku3", "。"], 
-                zhuyin: ["ㄅㄧㄠ3", "ㄍㄜ1", "ㄉㄜ5", "ㄍㄨㄥ1", "ㄗㄨㄛ4", "ㄒㄩ1", "ㄧㄠ4", "ㄉㄠ4", "ㄔㄨ4", "ㄅㄞ4", "ㄈㄤ3", "ㄍㄨ4", "ㄎㄜ4", "，", "ㄊㄨㄟ1", "ㄒㄧㄠ1", "ㄔㄢ3", "ㄆㄧㄣ3", "，", "ㄈㄟ1", "ㄔㄤ2", "ㄒㄧㄣ1", "ㄎㄨ3", "。"] 
-            },
-            { 
-                hanzi: "隨著環境污染越來越嚴重，生病的人也越來越多。", 
-                pinyin: ["sui2", "zhe5", "huan2", "jing4", "wu1", "ran3", "yue4", "lai2", "yue4", "yan2", "zhong4", "，", "sheng1", "bing4", "de5", "ren2", "ye3", "yue4", "lai2", "yue4", "duo1", "。"], 
-                zhuyin: ["ㄙㄨㄟ2", "ㄓㄜ5", "ㄏㄨㄢ2", "ㄐㄧㄥ4", "ㄨ1", "ㄖㄢ3", "ㄩㄝ4", "ㄌㄞ2", "ㄩㄝ4", "ㄧㄢ2", "ㄓㄨㄥ4", "，", "ㄕㄥ1", "ㄅㄧㄥ4", "ㄉㄜ5", "ㄖㄣ2", "ㄧㄝ3", "ㄩㄝ4", "ㄌㄞ2", "ㄩㄝ4", "ㄉㄨㄛ1", "。"] 
-            },
-            { 
-                hanzi: "我寧可不要睡覺，也要熬夜打電動。", 
-                pinyin: ["wo3", "ning4", "ke3", "bu2", "yao4", "shui4", "jiao4", "，", "ye3", "yao4", "ao2", "ye4", "da3", "dian4", "dong4", "。"], 
-                zhuyin: ["ㄨㄛ3", "ㄋㄧㄥ4", "ㄎㄜ3", "ㄅㄨ2", "ㄧㄠ4", "ㄕㄨㄟ4", "ㄐㄧㄠ4", "，", "ㄧㄝ3", "ㄧㄠ4", "ㄠ2", "ㄧㄝ4", "ㄉㄚ3", "ㄉㄧㄢ4", "ㄉㄨㄥ4", "。"] 
-            }
-        ],
-        "1": [
-            { 
-                hanzi: "一二三，四五六。", 
-                pinyin: ["yi1", "er4", "san1", "，", "si4", "wu3", "liu4", "。"], 
-                zhuyin: ["ㄧ1", "ㄦ4", "ㄙㄢ1", "，", "ㄙ4", "ㄨ3", "ㄌㄧㄡ4", "。"] 
-            }
-        ]
+    // 作文題庫
+    const essayData = {
+        "1": "每個人都有自己的夢想。\n\n我的夢想是成為一名優秀的軟體工程師，因為我喜歡用程式解決生活中的各種問題。為了達成這個目標，我每天都會花時間練習打字和撰寫程式碼。\n\n只要持續努力，我相信總有一天能實現這個夢想。",
+        "2": "去年夏天，我和家人一起去了花蓮旅行。\n\n那裡的海非常藍，空氣也很清新。我們騎著腳踏車沿著海岸線吹風，還吃了很多當地著名的特色小吃。\n\n那是一趟令我非常難忘的旅程，希望下次還有機會能再去一次。"
     };
 
-    let currentLesson = "7";
-    let currentMode = "pinyin";
-    let currentLevel = 0;
-    let score = 0;
-    let totalLessonScore = 0; 
-    let questions = [];
+    let pasteUsed = false; // 核心機關：用來紀錄是否已經貼上過
 
-    function initGame() {
-        currentLesson = document.getElementById("lessonSelect").value;
-        currentMode = document.getElementById("modeSelect").value;
-        questions = courseData[currentLesson];
-        currentLevel = 0;
-        score = 0;
+    // 載入文章
+    function loadEssay() {
+        const selected = document.getElementById("essaySelect").value;
+        document.getElementById("essaySource").innerText = essayData[selected];
         
-        totalLessonScore = 0;
-        for (let i = 0; i < questions.length; i++) {
-            totalLessonScore += questions[i].hanzi.length;
-        }
-
-        updateStatus();
-        loadQuestion();
+        // 切換文章時，清空右側輸入格並清除結果
+        document.getElementById("essayInput").value = "";
+        document.getElementById("essayInput").disabled = false;
+        document.getElementById("resultDisplay").innerText = "";
+        
+        // 重置貼上機會
+        pasteUsed = false;
+        const hintEl = document.getElementById("pasteHint");
+        hintEl.innerText = "💡 注意：為訓練打字，本文輸入格只有「一次」貼上文字的機會！";
+        hintEl.className = "hint"; // 恢復原本的紅色警告樣式
     }
 
-    function loadQuestion() {
-        if (currentLevel >= questions.length) {
-            document.getElementById("hanziContainer").innerHTML = "🎉 恭喜完成本課所有關卡！ (Congratulations!)";
-            document.getElementById("userInput").style.display = "none";
-            document.getElementById("submitBtn").style.display = "none";
+    // 🔒 監聽輸入格的「貼上(paste)」事件
+    document.getElementById("essayInput").addEventListener("paste", function(e) {
+        if (pasteUsed) {
+            // 如果 pasteUsed 已經是 true，就強制阻止貼上行為
+            e.preventDefault(); 
+            alert("⚠️ 系統提醒：你已經使用過一次貼上功能了！接下來請自己打字完成喔。");
+        } else {
+            // 第一次貼上，放行，但把狀態改成 true
+            pasteUsed = true;
+            const hintEl = document.getElementById("pasteHint");
+            hintEl.innerText = "🔒 貼上機會已使用完畢！接下來只能手動輸入。";
+            hintEl.className = "hint used"; // 變成灰色的已使用樣式
+        }
+    });
+
+    // 簡單的批改邏輯
+    function checkEssay() {
+        const sourceText = document.getElementById("essaySource").innerText.trim();
+        const inputText = document.getElementById("essayInput").value.trim();
+        const resultEl = document.getElementById("resultDisplay");
+
+        if (inputText === "") {
+            resultEl.innerText = "❌ 你還沒有輸入任何內容喔！";
+            resultEl.style.color = "#e74c3c";
             return;
         }
 
-        const q = questions[currentLevel];
-        const hanziContainer = document.getElementById("hanziContainer");
-        hanziContainer.innerHTML = ""; 
-        
-        for (let i = 0; i < q.hanzi.length; i++) {
-            let span = document.createElement("span");
-            span.className = "hanzi-char";
-            span.id = "hanzi-" + i;
-            span.innerText = q.hanzi[i];
-            hanziContainer.appendChild(span);
+        if (inputText === sourceText) {
+            resultEl.innerText = "🎉 太棒了！一字不漏，完全正確！";
+            resultEl.style.color = "#2ecc71";
+            document.getElementById("essayInput").disabled = true; // 正確就鎖定輸入框
+        } else {
+            // 計算字數差異給予回饋
+            resultEl.innerText = `📝 已送出！你輸入了 ${inputText.length} 個字，原文共有 ${sourceText.length} 個字。\n（請檢查是否有漏字、錯字或標點符號不一致）`;
+            resultEl.style.color = "#d35400";
         }
-
-        document.getElementById("userInput").value = "";
-        document.getElementById("userInput").disabled = false;
-        document.getElementById("submitBtn").style.display = "inline-block";
-        document.getElementById("nextBtn").style.display = "none";
-        document.getElementById("feedbackContainer").style.display = "none";
-        document.getElementById("userInput").focus();
     }
 
-    function checkAnswer() {
-        const q = questions[currentLevel];
-        const correctAnswers = q[currentMode]; 
-        const userInputText = document.getElementById("userInput").value.trim().replace(/\s+/g, ' ');
-        const userAnswers = userInputText.split(" "); 
-
-        let feedbackHTML = `<strong>結果分析 (Result)：</strong><br>`;
-        let pointsEarned = 0;
-        const pointPerChar = 1; 
-
-        for (let i = 0; i < q.hanzi.length; i++) {
-            const char = q.hanzi[i];
-            const correctAns = correctAnswers[i];
-            const userAns = userAnswers[i] || "(未輸入/Empty)";
-
-            const hanziSpan = document.getElementById("hanzi-" + i);
-
-            if (userAns.toLowerCase() === correctAns.toLowerCase()) {
-                hanziSpan.classList.add("correct");
-                if (char !== "，" && char !== "。") {
-                    feedbackHTML += `<div class="char-feedback correct">✅ ${char} : 你的答案 [${userAns}]</div>`;
-                }
-                pointsEarned += pointPerChar;
-            } else {
-                hanziSpan.classList.add("error");
-                feedbackHTML += `<div class="char-feedback error">❌ ${char} : 你的答案 [${userAns}] ➔ 正確應為 [${correctAns}]</div>`;
-            }
-        }
-
-        score += pointsEarned;
-        updateStatus();
-
-        const feedbackContainer = document.getElementById("feedbackContainer");
-        feedbackContainer.innerHTML = feedbackHTML;
-        feedbackContainer.style.display = "block";
-
-        document.getElementById("userInput").disabled = true;
-        document.getElementById("submitBtn").style.display = "none";
-        document.getElementById("nextBtn").style.display = "inline-block";
-    }
-
-    function nextLevel() {
-        currentLevel++;
-        updateStatus();
-        loadQuestion();
-    }
-
-    function updateStatus() {
-        let displayLevel = currentLevel + 1;
-        if (displayLevel > questions.length) displayLevel = questions.length;
-        document.getElementById("levelDisplay").innerText = `關卡 (Level)：${displayLevel} / ${questions.length}`;
-        document.getElementById("scoreDisplay").innerText = `總分 (Score)：${score} / ${totalLessonScore}`;
-    }
-
-    document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById("lessonSelect").addEventListener("change", initGame);
-        document.getElementById("modeSelect").addEventListener("change", initGame);
-        initGame();
-    });
-
+    // 網頁載入時初始化
+    window.onload = loadEssay;
 </script>
+
 </body>
 </html>
