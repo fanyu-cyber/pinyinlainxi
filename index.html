@@ -3,135 +3,79 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>華語打字 - 作文練習模式</title>
+    <title>純淨打字截圖區</title>
     <style>
-        body { font-family: 'Microsoft JhengHei', sans-serif; background-color: #f4f7f6; padding: 20px; display: flex; justify-content: center; }
-        .container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); width: 100%; max-width: 1000px; }
-        
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        select, button { padding: 10px; font-size: 16px; border-radius: 5px; border: 1px solid #ccc; }
-        button { background-color: #3498db; color: white; border: none; cursor: pointer; font-weight: bold; transition: 0.3s; }
-        button:hover { background-color: #2980b9; }
+        /* 重置基本設定 */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
 
-        .hint { color: #e74c3c; font-size: 16px; font-weight: bold; background: #fadbd8; padding: 10px; border-radius: 5px; margin-bottom: 20px; text-align: center; }
-        .hint.used { color: #7f8c8d; background: #ecf0f1; }
+        /* 背景設定：加上一點淺灰底色，讓白色的打字區更突出，截圖更好看 */
+        body {
+            background-color: #f0f2f5; 
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* 填滿整個螢幕高度 */
+            padding: 20px;
+        }
 
-        /* 左右分割版面 */
-        .split-layout { display: flex; gap: 20px; }
-        .left-pane, .right-pane { flex: 1; display: flex; flex-direction: column; }
-        
-        .pane-title { font-size: 18px; font-weight: bold; margin-bottom: 10px; color: #2c3e50; }
-        
-        .essay-source { background: #fdfbf7; padding: 20px; border: 1px solid #e0d6c8; border-radius: 8px; font-size: 18px; line-height: 1.8; color: #333; height: 400px; overflow-y: auto; white-space: pre-wrap; }
-        
-        textarea { width: 100%; height: 400px; font-size: 18px; line-height: 1.8; padding: 15px; border: 1px solid #bdc3c7; border-radius: 8px; resize: none; box-sizing: border-box; font-family: 'Microsoft JhengHei', sans-serif; }
-        textarea:focus { outline: none; border-color: #3498db; box-shadow: 0 0 5px rgba(52, 152, 219, 0.5); }
+        /* 打字輸入格主體設定 */
+        textarea {
+            width: 100%;
+            height: 100%;
+            max-width: 1200px; /* 限制最大寬度，避免在大螢幕上單行字數過長導致閱讀疲勞 */
+            background-color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.08); /* 加上柔和的陰影，截圖時有立體感 */
+            padding: 50px; /* 留出舒服的邊界空白 */
+            
+            /* 字體與排版設定 */
+            font-family: 'PingFang TC', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; /* 優先使用最清晰的繁體黑體 */
+            font-size: 28px; /* 大小適中，13吋螢幕可塞下300字以上 */
+            line-height: 1.7; /* 拉寬行距，一目了然 */
+            letter-spacing: 1px; /* 微調字距 */
+            color: #2c3e50; /* 使用深藍灰色代替純黑，看起來更柔和高級 */
+            
+            resize: none; /* 禁止使用者手動拉動改變大小 */
+            outline: none; /* 點擊時不會出現醜醜的預設外框 */
+        }
 
-        .submit-area { text-align: right; margin-top: 15px; }
-        #resultDisplay { margin-top: 15px; font-size: 18px; font-weight: bold; text-align: center; }
+        /* 提示文字的顏色 */
+        textarea::placeholder {
+            color: #bdc3c7;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h2>📝 作文打字練習區</h2>
-        <select id="essaySelect" onchange="loadEssay()">
-            <option value="1">第一篇：我的夢想</option>
-            <option value="2">第二篇：難忘的旅行</option>
-        </select>
-    </div>
+    <textarea id="typingBox" placeholder="請在此直接輸入文字... (已關閉複製貼上與右鍵功能，請全程手動輸入)"></textarea>
 
-    <div id="pasteHint" class="hint">
-        💡 注意：為訓練打字，本文輸入格只有「一次」貼上文字的機會！
-    </div>
+    <script>
+        const box = document.getElementById('typingBox');
 
-    <div class="split-layout">
-        <div class="left-pane">
-            <div class="pane-title">📖 閱讀文章</div>
-            <div id="essaySource" class="essay-source">載入中...</div>
-        </div>
+        // 1. 禁止貼上 (Paste)
+        box.addEventListener('paste', function(e) {
+            e.preventDefault();
+            alert("⚠️ 此區域禁止貼上，請自己手動輸入喔！");
+        });
 
-        <div class="right-pane">
-            <div class="pane-title">⌨️ 請在此輸入</div>
-            <textarea id="essayInput" placeholder="請對照左方文章，在此輸入內容..."></textarea>
-            
-            <div class="submit-area">
-                <button onclick="checkEssay()">送出批改 (Submit)</button>
-            </div>
-        </div>
-    </div>
+        // 2. 禁止複製 (Copy) 與 剪下 (Cut) - 確保內容不能被輕易帶走
+        box.addEventListener('copy', function(e) {
+            e.preventDefault();
+        });
+        box.addEventListener('cut', function(e) {
+            e.preventDefault();
+        });
 
-    <div id="resultDisplay"></div>
-</div>
-
-<script>
-    // 作文題庫
-    const essayData = {
-        "1": "每個人都有自己的夢想。\n\n我的夢想是成為一名優秀的軟體工程師，因為我喜歡用程式解決生活中的各種問題。為了達成這個目標，我每天都會花時間練習打字和撰寫程式碼。\n\n只要持續努力，我相信總有一天能實現這個夢想。",
-        "2": "去年夏天，我和家人一起去了花蓮旅行。\n\n那裡的海非常藍，空氣也很清新。我們騎著腳踏車沿著海岸線吹風，還吃了很多當地著名的特色小吃。\n\n那是一趟令我非常難忘的旅程，希望下次還有機會能再去一次。"
-    };
-
-    let pasteUsed = false; // 核心機關：用來紀錄是否已經貼上過
-
-    // 載入文章
-    function loadEssay() {
-        const selected = document.getElementById("essaySelect").value;
-        document.getElementById("essaySource").innerText = essayData[selected];
-        
-        // 切換文章時，清空右側輸入格並清除結果
-        document.getElementById("essayInput").value = "";
-        document.getElementById("essayInput").disabled = false;
-        document.getElementById("resultDisplay").innerText = "";
-        
-        // 重置貼上機會
-        pasteUsed = false;
-        const hintEl = document.getElementById("pasteHint");
-        hintEl.innerText = "💡 注意：為訓練打字，本文輸入格只有「一次」貼上文字的機會！";
-        hintEl.className = "hint"; // 恢復原本的紅色警告樣式
-    }
-
-    // 🔒 監聽輸入格的「貼上(paste)」事件
-    document.getElementById("essayInput").addEventListener("paste", function(e) {
-        if (pasteUsed) {
-            // 如果 pasteUsed 已經是 true，就強制阻止貼上行為
-            e.preventDefault(); 
-            alert("⚠️ 系統提醒：你已經使用過一次貼上功能了！接下來請自己打字完成喔。");
-        } else {
-            // 第一次貼上，放行，但把狀態改成 true
-            pasteUsed = true;
-            const hintEl = document.getElementById("pasteHint");
-            hintEl.innerText = "🔒 貼上機會已使用完畢！接下來只能手動輸入。";
-            hintEl.className = "hint used"; // 變成灰色的已使用樣式
-        }
-    });
-
-    // 簡單的批改邏輯
-    function checkEssay() {
-        const sourceText = document.getElementById("essaySource").innerText.trim();
-        const inputText = document.getElementById("essayInput").value.trim();
-        const resultEl = document.getElementById("resultDisplay");
-
-        if (inputText === "") {
-            resultEl.innerText = "❌ 你還沒有輸入任何內容喔！";
-            resultEl.style.color = "#e74c3c";
-            return;
-        }
-
-        if (inputText === sourceText) {
-            resultEl.innerText = "🎉 太棒了！一字不漏，完全正確！";
-            resultEl.style.color = "#2ecc71";
-            document.getElementById("essayInput").disabled = true; // 正確就鎖定輸入框
-        } else {
-            // 計算字數差異給予回饋
-            resultEl.innerText = `📝 已送出！你輸入了 ${inputText.length} 個字，原文共有 ${sourceText.length} 個字。\n（請檢查是否有漏字、錯字或標點符號不一致）`;
-            resultEl.style.color = "#d35400";
-        }
-    }
-
-    // 網頁載入時初始化
-    window.onload = loadEssay;
-</script>
+        // 3. 鎖定右鍵選單
+        box.addEventListener('contextmenu', function(e) {
+            e.preventDefault();
+        });
+    </script>
 
 </body>
 </html>
